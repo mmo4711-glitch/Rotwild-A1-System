@@ -18,6 +18,10 @@ import Wildschaden from "@/pages/wildschaden";
 import Kalender from "@/pages/kalender";
 import Strecke from "@/pages/strecke";
 import Architektur from "@/pages/architektur";
+import Wetter from "@/pages/wetter";
+import Wildkamera from "@/pages/wildkamera";
+import Tagebuch from "@/pages/tagebuch";
+import Wildwiesen from "@/pages/wildwiesen";
 import NotFound from "@/pages/not-found";
 
 function AppRouter() {
@@ -32,7 +36,11 @@ function AppRouter() {
       <Route path="/genetics" component={Genetics} />
       <Route path="/wildschaden" component={Wildschaden} />
       <Route path="/kalender" component={Kalender} />
+      <Route path="/wetter" component={Wetter} />
       <Route path="/strecke" component={Strecke} />
+      <Route path="/wildkamera" component={Wildkamera} />
+      <Route path="/tagebuch" component={Tagebuch} />
+      <Route path="/wildwiesen" component={Wildwiesen} />
       <Route path="/health" component={Health} />
       <Route path="/architektur" component={Architektur} />
       <Route component={NotFound} />

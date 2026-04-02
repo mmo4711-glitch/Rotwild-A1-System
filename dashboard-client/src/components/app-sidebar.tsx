@@ -5,10 +5,14 @@ import {
   BarChart3,
   Map,
   Dna,
-  Activity,
   ShieldAlert,
   Calendar,
+  CloudRain,
   Target,
+  Camera,
+  BookMarked,
+  Sprout,
+  Activity,
   Layers,
 } from "lucide-react";
 import {
@@ -24,17 +28,52 @@ import {
   SidebarFooter,
 } from "@/components/ui/sidebar";
 
-const navItems = [
-  { title: "Handbuch", url: "/handbuch", icon: BookOpen },
-  { title: "Philosophie", url: "/philosophie", icon: Compass },
-  { title: "Populationsdynamik", url: "/population", icon: BarChart3 },
-  { title: "Habitatbewertung", url: "/habitat", icon: Map },
-  { title: "Ne-Genetik", url: "/genetics", icon: Dna },
-  { title: "Wildschaden", url: "/wildschaden", icon: ShieldAlert },
-  { title: "Jagdkalender", url: "/kalender", icon: Calendar },
-  { title: "Strecke & Schein", url: "/strecke", icon: Target },
-  { title: "System-Health", url: "/health", icon: Activity },
-  { title: "Architektur", url: "/architektur", icon: Layers },
+interface NavItem {
+  title: string;
+  url: string;
+  icon: any;
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
+
+const navGroups: NavGroup[] = [
+  {
+    label: "Übersicht",
+    items: [
+      { title: "Handbuch", url: "/handbuch", icon: BookOpen },
+      { title: "Philosophie", url: "/philosophie", icon: Compass },
+    ],
+  },
+  {
+    label: "Analyse",
+    items: [
+      { title: "Populationsdynamik", url: "/population", icon: BarChart3 },
+      { title: "Habitatbewertung", url: "/habitat", icon: Map },
+      { title: "Ne-Genetik", url: "/genetics", icon: Dna },
+      { title: "Wildschaden", url: "/wildschaden", icon: ShieldAlert },
+    ],
+  },
+  {
+    label: "Feld",
+    items: [
+      { title: "Jagdkalender", url: "/kalender", icon: Calendar },
+      { title: "Wetter", url: "/wetter", icon: CloudRain },
+      { title: "Strecke & Schein", url: "/strecke", icon: Target },
+      { title: "Wildkamera", url: "/wildkamera", icon: Camera },
+      { title: "Reviertagebuch", url: "/tagebuch", icon: BookMarked },
+      { title: "Wildwiesen", url: "/wildwiesen", icon: Sprout },
+    ],
+  },
+  {
+    label: "System",
+    items: [
+      { title: "System-Health", url: "/health", icon: Activity },
+      { title: "Architektur", url: "/architektur", icon: Layers },
+    ],
+  },
 ];
 
 export function AppSidebar() {
@@ -81,36 +120,38 @@ export function AppSidebar() {
         </Link>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-[10px] tracking-widest uppercase text-muted-foreground">
-            Module
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => {
-                const isActive = location.startsWith(item.url);
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={isActive}
-                      data-testid={`nav-${item.url.replace("/", "") || "home"}`}
-                    >
-                      <Link href={item.url}>
-                        <item.icon className="h-4 w-4" />
-                        <span className="text-sm">{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                );
-              })}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {navGroups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel className="text-[10px] tracking-widest uppercase text-[hsl(110,30%,45%)]">
+              {group.label}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const isActive = location.startsWith(item.url);
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton
+                        asChild
+                        isActive={isActive}
+                        data-testid={`nav-${item.url.replace("/", "") || "home"}`}
+                      >
+                        <Link href={item.url}>
+                          <item.icon className="h-4 w-4" />
+                          <span className="text-sm">{item.title}</span>
+                        </Link>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
       </SidebarContent>
       <SidebarFooter className="p-4 border-t border-[hsl(110,30%,16%)]">
         <div className="text-[10px] text-muted-foreground">
-          <p>v2.1.0 · Rotwild-A1</p>
+          <p>v2.2.0 · Rotwild-A1</p>
           <p className="mt-1 opacity-60">© 2026 Jagdhandbuch</p>
         </div>
       </SidebarFooter>

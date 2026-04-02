@@ -34,3 +34,46 @@ export const insertHarvestSchema = createInsertSchema(harvests).omit({
 
 export type InsertHarvest = z.infer<typeof insertHarvestSchema>;
 export type Harvest = typeof harvests.$inferSelect;
+
+// ── Camera Sightings (Wildkamera) ────────────────────────────
+export const cameraSightings = sqliteTable("camera_sightings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  date: text("date").notNull(),
+  time: text("time").notNull(),
+  camera: text("camera").notNull(),
+  species: text("species"),
+  count: integer("count"),
+  sex: text("sex"),
+  ageClass: text("age_class"),
+  behavior: text("behavior"),
+  notes: text("notes"),
+  temperature: real("temperature"),
+  moonPhase: text("moon_phase"),
+});
+
+export const insertCameraSightingSchema = createInsertSchema(cameraSightings).omit({
+  id: true,
+});
+
+export type InsertCameraSighting = z.infer<typeof insertCameraSightingSchema>;
+export type CameraSighting = typeof cameraSightings.$inferSelect;
+
+// ── Log Entries (Reviertagebuch) ─────────────────────────────
+export const logEntries = sqliteTable("log_entries", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  date: text("date").notNull(),
+  time: text("time"),
+  category: text("category").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  sector: text("sector"),
+  weather: text("weather"),
+  priority: text("priority"),
+});
+
+export const insertLogEntrySchema = createInsertSchema(logEntries).omit({
+  id: true,
+});
+
+export type InsertLogEntry = z.infer<typeof insertLogEntrySchema>;
+export type LogEntry = typeof logEntries.$inferSelect;
