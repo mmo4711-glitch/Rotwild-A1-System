@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Label } from "@/components/ui/label";
@@ -23,6 +23,7 @@ import {
   Info,
   Target,
 } from "lucide-react";
+import { usePopulation } from "@/lib/population-context";
 import {
   MERSCHBACH_DEFAULTS,
   calculateLambda,
@@ -50,10 +51,21 @@ interface HarvestRow {
 }
 
 export default function Wildschaden() {
+  const ctx = usePopulation();
+
   // === Section A: Risk model sliders ===
-  const [densityRatio, setDensityRatio] = useState(0.72); // N/K
+  // Auto-set density ratio from live population
+  const liveRatio = ctx.K > 0 ? ctx.totalN / ctx.K : 0.72;
+  const [densityRatio, setDensityRatio] = useState(0.72);
   const [edgeDistance, setEdgeDistance] = useState(350); // meters
   const [snowDepth, setSnowDepth] = useState(15); // cm
+
+  // Sync density ratio from live population on mount / when context updates
+  useEffect(() => {
+    if (ctx.totalN > 0 && ctx.K > 0) {
+      setDensityRatio(Math.round((ctx.totalN / ctx.K) * 100) / 100);
+    }
+  }, [ctx.totalN, ctx.K]);
 
   // Risk formula: Carpio et al. 2021
   const w1 = 0.60;
@@ -74,8 +86,15 @@ export default function Wildschaden() {
           : { label: "Sehr Hoch", color: "#b44040" };
 
   // === Section B: Harvest optimizer ===
-  const K = MERSCHBACH_DEFAULTS.K;
+  const K = ctx.K;
   const currentState: PopulationState = useMemo(() => {
+    // Use live population from context when density ratio matches context
+    const liveRatioRounded = ctx.K > 0 ? Math.round((ctx.totalN / ctx.K) * 100) / 100 : 0;
+    if (Math.abs(densityRatio - liveRatioRounded) < 0.02) {
+      // Use actual context population structure
+      return ctx.population;
+    }
+    // Manual slider override: compute from density ratio
     const N = Math.round(densityRatio * K);
     const ratio = N / MERSCHBACH_DEFAULTS.initialN;
     return {
@@ -86,7 +105,7 @@ export default function Wildschaden() {
       senescentMale: Math.max(1, Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.senescentMale * ratio)),
       senescentFemale: Math.max(1, Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.senescentFemale * ratio)),
     };
-  }, [densityRatio, K]);
+  }, [densityRatio, K, ctx.population, ctx.totalN, ctx.K]);
 
   const N = totalN(currentState);
   const lambda = calculateLambda(currentState, defaultRates, K);
@@ -145,14 +164,39 @@ export default function Wildschaden() {
 
   const totalHarvest = harvestRows.reduce((sum, r) => sum + r.entnahme, 0);
 
-  // Jahresabschussplan data
-  const abschussplanRows = [
-    { wildart: "Rotwild", klasse: "Kälber", bestand: 10, zuwachs: "—", abgang: 3, empfehlung: 2, maennlich: 1, weiblich: 1 },
-    { wildart: "Rotwild", klasse: "Jährlinge", bestand: 8, zuwachs: "7", abgang: 1, empfehlung: 1, maennlich: 1, weiblich: 0 },
-    { wildart: "Rotwild", klasse: "Adulte", bestand: 20, zuwachs: "—", abgang: 1, empfehlung: 0, maennlich: 0, weiblich: 0 },
-    { wildart: "Rotwild", klasse: "Alte", bestand: 7, zuwachs: "—", abgang: 2, empfehlung: 0, maennlich: 0, weiblich: 0 },
-  ];
-  const abschussplanGesamt = { bestand: 45, zuwachs: "7", abgang: 7, empfehlung: 3, maennlich: 2, weiblich: 1 };
+  // Jahresabschussplan data — now uses live population numbers
+  const abschussplanRows = useMemo(() => {
+    const jM = currentState.juvenilMale;
+    const jF = currentState.juvenilFemale;
+    const pM = currentState.primeMale;
+    const pF = currentState.primeFemale;
+    const sM = currentState.senescentMale;
+    const sF = currentState.senescentFemale;
+    const calves = jM + jF;
+    const jaehrlinge = Math.round(calves * 0.65); // estimated yearling survivors
+    const adulte = pM + pF;
+    const alte = sM + sF;
+    const msyAbs = msy.absolute;
+    const kE = isLowPop ? 0 : Math.round(msyAbs * 0.30);
+    const jE = isLowPop ? 0 : Math.round(msyAbs * 0.10);
+    const aE = isLowPop ? 0 : Math.round(msyAbs * 0.40);
+    const alE = isLowPop ? 0 : Math.round(msyAbs * 0.20);
+    return [
+      { wildart: "Rotwild", klasse: "Kälber", bestand: calves, zuwachs: "—", abgang: Math.round(calves * 0.35), empfehlung: kE, maennlich: Math.ceil(kE / 2), weiblich: Math.floor(kE / 2) },
+      { wildart: "Rotwild", klasse: "Jährlinge", bestand: jaehrlinge, zuwachs: String(Math.round(calves * 0.65)), abgang: Math.round(jaehrlinge * 0.15), empfehlung: jE, maennlich: Math.ceil(jE / 2), weiblich: Math.floor(jE / 2) },
+      { wildart: "Rotwild", klasse: "Adulte", bestand: adulte, zuwachs: "—", abgang: Math.round(adulte * 0.08), empfehlung: aE, maennlich: Math.ceil(aE * 0.6), weiblich: Math.floor(aE * 0.4) },
+      { wildart: "Rotwild", klasse: "Alte", bestand: alte, zuwachs: "—", abgang: Math.round(alte * 0.30), empfehlung: alE, maennlich: Math.ceil(alE * 0.6), weiblich: Math.floor(alE * 0.4) },
+    ];
+  }, [currentState, msy.absolute, isLowPop]);
+  const abschussplanGesamt = useMemo(() => {
+    const b = abschussplanRows.reduce((s, r) => s + r.bestand, 0);
+    const z = abschussplanRows.reduce((s, r) => s + (r.zuwachs === "—" ? 0 : Number(r.zuwachs)), 0);
+    const a = abschussplanRows.reduce((s, r) => s + r.abgang, 0);
+    const e = abschussplanRows.reduce((s, r) => s + r.empfehlung, 0);
+    const m = abschussplanRows.reduce((s, r) => s + r.maennlich, 0);
+    const w = abschussplanRows.reduce((s, r) => s + r.weiblich, 0);
+    return { bestand: b, zuwachs: z > 0 ? String(z) : "—", abgang: a, empfehlung: e, maennlich: m, weiblich: w };
+  }, [abschussplanRows]);
 
   return (
     <div className="p-4 space-y-4" data-testid="page-wildschaden">
@@ -569,8 +613,8 @@ export default function Wildschaden() {
           {/* Note about λ */}
           <div className="p-2.5 rounded-lg border border-card-border bg-background">
             <p className="text-[10px] text-muted-foreground">
-              Hinweis: Bei λ=0.969 ist die Population leicht rückläufig. Die Abschussempfehlung ist daher minimal gehalten,
-              um den Bestandsaufbau nicht zu gefährden. Basierend auf Leslie-Matrix-Projektion mit dichteabhängiger Regulation (Bonenfant et al. 2009).
+              Hinweis: Bei λ={lambda.toFixed(3)} ist die Population {lambda >= 1 ? "stabil/wachsend" : "leicht rückläufig"}. Die Abschussempfehlung ist daher {lambda < 1 ? "minimal gehalten, um den Bestandsaufbau nicht zu gefährden" : "nach MSY berechnet"}.
+              Basierend auf Leslie-Matrix-Projektion mit dichteabhängiger Regulation (Bonenfant et al. 2009).
             </p>
           </div>
 

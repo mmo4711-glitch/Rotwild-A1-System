@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,22 @@ import {
   Sun,
   Eye,
 } from "lucide-react";
+
+// ── WMO Weather Code to Emoji ──────────────────────────────────
+function wmoEmoji(code: number): string {
+  if (code === 0) return "☀️";
+  if (code === 1) return "🌤️";
+  if (code === 2) return "⛅";
+  if (code === 3) return "☁️";
+  if (code === 45 || code === 48) return "🌫️";
+  if (code >= 51 && code <= 55) return "🌦️";
+  if (code >= 56 && code <= 67) return "🌧️";
+  if (code >= 71 && code <= 77) return "🌨️";
+  if (code >= 80 && code <= 82) return "🌧️";
+  if (code >= 85 && code <= 86) return "🌨️";
+  if (code >= 95) return "⛈️";
+  return "🌤️";
+}
 
 // ── Wind / Thermik model ──────────────────────────────────────
 const WIND_DIRS = ["N", "NO", "O", "SO", "S", "SW", "W", "NW"] as const;
@@ -182,12 +198,28 @@ const MONTH_NAMES = [
 const WEEKDAYS = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"];
 
 // ── Component ────────────────────────────────────────────────
+import { usePopulation } from "@/lib/population-context";
+
 export default function Kalender() {
   const today = new Date();
+  const ctx = usePopulation();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());
   const [windDir, setWindDir] = useState<WindDir>("SW");
   const [temperature, setTemperature] = useState(8);
+
+  // Auto-sync wind direction and temperature from live weather
+  useEffect(() => {
+    if (ctx.currentWind && WIND_DIRS.includes(ctx.currentWind as WindDir)) {
+      setWindDir(ctx.currentWind as WindDir);
+    }
+  }, [ctx.currentWind]);
+
+  useEffect(() => {
+    if (ctx.currentTemp !== null) {
+      setTemperature(Math.round(ctx.currentTemp));
+    }
+  }, [ctx.currentTemp]);
 
   const moonToday = getMoonPhase(today);
   const tempInfo = tempLabel(temperature);
@@ -299,9 +331,16 @@ export default function Kalender() {
                       className={`h-16 rounded border p-1 flex flex-col ${dayCellColor(date)} ${dayIsToday ? "ring-2 ring-[#c49a2a]" : ""}`}
                       data-testid={`calendar-day-${date.getDate()}`}
                     >
-                      <span className={`text-xs font-semibold ${dayIsToday ? "text-[#c49a2a]" : ""}`}>
-                        {date.getDate()}
-                      </span>
+                      <div className="flex items-center justify-between">
+                        <span className={`text-xs font-semibold ${dayIsToday ? "text-[#c49a2a]" : ""}`}>
+                          {date.getDate()}
+                        </span>
+                        {dayIsToday && ctx.currentTemp !== null && ctx.weatherCode !== null && (
+                          <span className="text-[8px] text-muted-foreground" title={`${ctx.currentTemp}°C`}>
+                            {wmoEmoji(ctx.weatherCode)} {Math.round(ctx.currentTemp)}°
+                          </span>
+                        )}
+                      </div>
                       <div className="flex-1 flex flex-col justify-end gap-0.5">
                         <span className={`text-[8px] leading-tight font-medium px-1 rounded ${sectorColors[sector]} text-white/90`}>
                           {sector}
@@ -460,6 +499,16 @@ export default function Kalender() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-3 pt-0 space-y-3">
+              {/* Live weather indicator */}
+              {ctx.currentWind && ctx.currentTemp !== null && (
+                <div className="flex items-center gap-2 p-1.5 rounded bg-[#c49a2a]/10 border border-[#c49a2a]/20">
+                  <span className="text-[10px] text-[#c49a2a] font-semibold">LIVE</span>
+                  <span className="text-[10px] text-muted-foreground">
+                    {ctx.currentWind} {ctx.currentWindSpeed} km/h · {Math.round(ctx.currentTemp)}°C
+                  </span>
+                </div>
+              )}
+
               {/* Wind Direction */}
               <div className="space-y-1.5">
                 <label className="text-[10px] text-muted-foreground uppercase tracking-wider">Windrichtung</label>

@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
@@ -36,6 +36,7 @@ import {
 } from "recharts";
 import { PopulationPyramid } from "@/components/population-pyramid";
 import { FanChart } from "@/components/fan-chart";
+import { usePopulation } from "@/lib/population-context";
 import {
   MERSCHBACH_DEFAULTS,
   runMonteCarlo,
@@ -61,25 +62,35 @@ const defaultRates: PopulationRates = {
 };
 
 export default function Population() {
-  const [harvestRate, setHarvestRate] = useState(Math.round(MERSCHBACH_DEFAULTS.harvestRate * 100));
-  const [K, setK] = useState(MERSCHBACH_DEFAULTS.K);
+  const ctx = usePopulation();
+
+  // Sync local sliders with context (two-way)
+  const [harvestRate, setHarvestRateLocal] = useState(Math.round(ctx.harvestRate * 100));
+  const [K, setKLocal] = useState(ctx.K);
   const [projYears, setProjYears] = useState(MERSCHBACH_DEFAULTS.projectionYears);
-  const [initialPop, setInitialPop] = useState(MERSCHBACH_DEFAULTS.initialN);
+  const [initialPop, setInitialPopLocal] = useState(ctx.totalN > 0 ? Math.round(ctx.totalN) : MERSCHBACH_DEFAULTS.initialN);
   const [showWarnings, setShowWarnings] = useState(true);
   const [stochastic, setStochastic] = useState(true);
   const [simKey, setSimKey] = useState(0);
 
+  // Push slider changes to context
+  const setHarvestRate = useCallback((v: number) => {
+    setHarvestRateLocal(v);
+    ctx.setHarvestRate(v / 100);
+  }, [ctx]);
+  const setK = useCallback((v: number) => {
+    setKLocal(v);
+    ctx.setK(v);
+  }, [ctx]);
+  const setInitialPop = useCallback((v: number) => {
+    setInitialPopLocal(v);
+    ctx.setInitialN(v);
+  }, [ctx]);
+
   const currentState: PopulationState = useMemo(() => {
-    const ratio = initialPop / MERSCHBACH_DEFAULTS.initialN;
-    return {
-      juvenilMale: Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.juvenilMale * ratio),
-      juvenilFemale: Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.juvenilFemale * ratio),
-      primeMale: Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.primeMale * ratio),
-      primeFemale: Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.primeFemale * ratio),
-      senescentMale: Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.senescentMale * ratio),
-      senescentFemale: Math.round(MERSCHBACH_DEFAULTS.initialAgeStructure.senescentFemale * ratio),
-    };
-  }, [initialPop]);
+    // Use context population directly (already accounts for harvest)
+    return ctx.population;
+  }, [ctx.population]);
 
   const targetState: PopulationState = useMemo(() => {
     const kRatio = K / MERSCHBACH_DEFAULTS.K;
@@ -105,7 +116,7 @@ export default function Population() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const mcResult = useMemo(() => {
     return runMonteCarlo(currentState, defaultRates, K, harvestRate / 100, projYears, 200);
-  }, [simKey, K, harvestRate, projYears, initialPop]);
+  }, [simKey, K, harvestRate, projYears, currentState]);
 
   const runSim = useCallback(() => setSimKey((k) => k + 1), []);
 
@@ -217,6 +228,23 @@ export default function Population() {
         </h2>
         <span className="text-xs text-muted-foreground">Rotwild · Merschbach</span>
       </div>
+
+      {/* Harvest Season Banner */}
+      {ctx.harvestedThisSeason.rotwild > 0 && (
+        <div
+          className="flex items-center gap-3 p-3 rounded-lg border border-[#c49a2a]/30 bg-[#c49a2a]/10"
+          data-testid="banner-harvest-season"
+        >
+          <Target className="h-4 w-4 text-[#c49a2a] shrink-0" />
+          <p className="text-sm text-foreground">
+            <span className="font-semibold text-[#c49a2a]">Strecke 2026/27:</span>{" "}
+            {ctx.harvestedThisSeason.rotwild} Stück entnommen ({ctx.harvestedThisSeason.rotwildMale}♂ / {ctx.harvestedThisSeason.rotwildFemale}♀)
+            {ctx.harvestedThisSeason.total > ctx.harvestedThisSeason.rotwild && (
+              <span className="text-muted-foreground"> · + {ctx.harvestedThisSeason.total - ctx.harvestedThisSeason.rotwild} andere Wildarten</span>
+            )}
+          </p>
+        </div>
+      )}
 
       {/* KPI Cards */}
       <div className="grid grid-cols-4 gap-3">

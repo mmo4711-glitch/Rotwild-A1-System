@@ -1,4 +1,5 @@
 import { Link, useLocation } from "wouter";
+import { usePopulation } from "@/lib/population-context";
 import {
   BookOpen,
   Compass,
@@ -76,6 +77,55 @@ const navGroups: NavGroup[] = [
   },
 ];
 
+/** Wind direction arrow helper */
+function windArrow(dir: string | null): string {
+  if (!dir) return "";
+  const arrows: Record<string, string> = {
+    N: "\u2191", NO: "\u2197", O: "\u2192", SO: "\u2198",
+    S: "\u2193", SW: "\u2199", W: "\u2190", NW: "\u2196",
+  };
+  return arrows[dir] || "";
+}
+
+/** Compact status bar at the bottom of the sidebar — shows live population + weather at a glance. */
+function SidebarStatusBar() {
+  const [, navigate] = useLocation();
+  const ctx = usePopulation();
+
+  return (
+    <button
+      onClick={() => navigate("/population")}
+      className="w-full text-left rounded-md border border-[hsl(110,30%,16%)] bg-[hsl(130,20%,8%)] px-2.5 py-2 hover:border-[#c49a2a]/40 transition-colors cursor-pointer"
+      data-testid="sidebar-status-bar"
+    >
+      <div className="flex items-center justify-between text-[10px] font-mono text-[#8b9a7a] leading-relaxed">
+        <span>
+          N: <span className="text-foreground font-semibold">{Math.round(ctx.totalN)}</span>
+          {" "}(λ {ctx.lambda.toFixed(2)})
+        </span>
+        <span>
+          K: <span className="text-foreground font-semibold">{ctx.K}</span>
+          {" | "}N<sub>e</sub>: {Math.round(ctx.ne)}
+        </span>
+      </div>
+      {(ctx.currentTemp !== null || ctx.currentWind) && (
+        <div className="text-[10px] font-mono text-[#8b9a7a] mt-0.5">
+          {ctx.currentTemp !== null && (
+            <span>
+              {"\uD83C\uDF21\uFE0F"} {Math.round(ctx.currentTemp)}°C
+            </span>
+          )}
+          {ctx.currentWind && ctx.currentWindSpeed !== null && (
+            <span>
+              {" | "}{windArrow(ctx.currentWind)} {ctx.currentWind} {Math.round(ctx.currentWindSpeed)} km/h
+            </span>
+          )}
+        </div>
+      )}
+    </button>
+  );
+}
+
 export function AppSidebar() {
   const [location] = useLocation();
 
@@ -149,7 +199,8 @@ export function AppSidebar() {
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="p-4 border-t border-[hsl(110,30%,16%)]">
+      <SidebarFooter className="p-3 border-t border-[hsl(110,30%,16%)] space-y-2">
+        <SidebarStatusBar />
         <div className="text-[10px] text-muted-foreground">
           <p>v2.2.0 · Rotwild-A1</p>
           <p className="mt-1 opacity-60">© 2026 Jagdhandbuch</p>

@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import { useSidebar } from "@/components/ui/sidebar";
+import { usePopulation } from "@/lib/population-context";
 import {
   BookOpen,
   Compass,
@@ -8,8 +9,11 @@ import {
   Calendar,
   Target,
   TrendingDown,
+  TrendingUp,
   Leaf,
   ShieldCheck,
+  CloudRain,
+  Thermometer,
 } from "lucide-react";
 
 /* ─── antler/tree SVG logo ─── */
@@ -173,17 +177,38 @@ function MiniSparkline({ data, color }: { data: number[]; color: string }) {
   );
 }
 
-/* ─── Revier-Steckbrief data ─── */
-const steckbriefData = [
-  { label: "Gesamtfläche", value: "312 ha" },
-  { label: "Wald", value: "240 ha (77%)" },
-  { label: "Offenland", value: "72 ha (23%)" },
-  { label: "Höhenlage", value: "340–520 m ü.NN" },
-  { label: "Rotwild-Bestand", value: "~45 Stück" },
-  { label: "Zielbestand (K)", value: "62 / 120" },
-  { label: "Hochsitze", value: "5 (Typ A/B/C)" },
-  { label: "Wildkameras", value: "3 Stationen" },
-];
+/* ─── WMO Weather Code to Emoji ─── */
+function wmoEmoji(code: number): string {
+  if (code === 0) return "☀️";
+  if (code === 1) return "🌤️";
+  if (code === 2) return "⛅";
+  if (code === 3) return "☁️";
+  if (code === 45 || code === 48) return "🌫️";
+  if (code >= 51 && code <= 55) return "🌦️";
+  if (code >= 56 && code <= 57) return "🌧️";
+  if (code >= 61 && code <= 65) return "🌧️";
+  if (code >= 66 && code <= 67) return "🌨️";
+  if (code >= 71 && code <= 77) return "🌨️";
+  if (code >= 80 && code <= 82) return "🌧️";
+  if (code >= 85 && code <= 86) return "🌨️";
+  if (code >= 95) return "⛈️";
+  return "🌤️";
+}
+
+function wmoDescription(code: number): string {
+  if (code === 0) return "Klar";
+  if (code === 1) return "Überwiegend klar";
+  if (code === 2) return "Teilweise bewölkt";
+  if (code === 3) return "Bedeckt";
+  if (code === 45) return "Nebel";
+  if (code === 48) return "Reifnebel";
+  if (code >= 51 && code <= 55) return "Nieselregen";
+  if (code >= 61 && code <= 65) return "Regen";
+  if (code >= 71 && code <= 77) return "Schnee";
+  if (code >= 80 && code <= 82) return "Schauer";
+  if (code >= 95) return "Gewitter";
+  return "—";
+}
 
 /* ─── Quick-Links data ─── */
 const quickLinks = [
@@ -228,11 +253,48 @@ const quickLinks = [
 export default function Landing() {
   const [, navigate] = useLocation();
   const { setOpen } = useSidebar();
+  const ctx = usePopulation();
 
   const handleQuickLink = (route: string) => {
     setOpen(true);
     navigate(route);
   };
+
+  // Build dynamic Revier-Steckbrief
+  const steckbriefData = [
+    { label: "Gesamtfläche", value: "312 ha" },
+    { label: "Wald", value: "240 ha (77%)" },
+    { label: "Offenland", value: "72 ha (23%)" },
+    { label: "Höhenlage", value: "340–520 m ü.NN" },
+    { label: "Rotwild-Bestand", value: `~${Math.round(ctx.totalN)} Stück` },
+    { label: "Zielbestand (K)", value: `${ctx.K}` },
+    { label: "Hochsitze", value: "5 (Typ A/B/C)" },
+    { label: "Wildkameras", value: "3 Stationen" },
+  ];
+
+  // Population trend sparkline based on lambda
+  const sparkData = (() => {
+    const pts: number[] = [ctx.totalN];
+    let n = ctx.totalN;
+    for (let i = 1; i < 10; i++) {
+      n = n * ctx.lambda;
+      pts.push(Math.round(n));
+    }
+    return pts;
+  })();
+
+  // Compliance check
+  const blockers = ctx.warnings.filter((w) => w.level === "danger").length;
+  const warningCount = ctx.warnings.filter((w) => w.level === "warning").length;
+  const complianceText =
+    blockers > 0
+      ? `${blockers} Blocker aktiv`
+      : warningCount > 0
+        ? `${warningCount} Warnung${warningCount > 1 ? "en" : ""}`
+        : "Alles im grünen Bereich";
+  const complianceColor = blockers > 0 ? "#b44040" : warningCount > 0 ? "#c49a2a" : "#4a9e4a";
+  const complianceTotal = 25;
+  const compliancePassed = complianceTotal - blockers;
 
   return (
     <div className="min-h-full" data-testid="page-landing">
@@ -307,13 +369,13 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* ─── Aktueller Status (3 cards) ─── */}
+      {/* ─── Aktueller Status (4 cards) ─── */}
       <section className="px-6 pb-12 max-w-5xl mx-auto">
         <h2 className="font-display text-sm font-semibold tracking-[0.2em] text-[#c49a2a] uppercase mb-6 text-center">
           Aktueller Status
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Card 1: Populationsdynamik */}
           <div
             className="rounded-lg border border-[hsl(110,25%,18%)] bg-[hsl(130,20%,10%)] p-5 space-y-3 cursor-pointer hover:border-[#c49a2a]/40 transition-colors"
@@ -321,21 +383,30 @@ export default function Landing() {
             data-testid="card-status-population"
           >
             <div className="flex items-center gap-2">
-              <TrendingDown className="h-4 w-4 text-[#c49a2a]" />
+              {ctx.lambda >= 1 ? (
+                <TrendingUp className="h-4 w-4 text-[#4a9e4a]" />
+              ) : (
+                <TrendingDown className="h-4 w-4 text-[#c49a2a]" />
+              )}
               <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
                 Populationsdynamik
               </span>
             </div>
             <div className="flex items-baseline gap-4">
               <div>
-                <span className="text-2xl font-mono font-bold text-foreground">N=45</span>
+                <span className="text-2xl font-mono font-bold text-foreground">N={Math.round(ctx.totalN)}</span>
               </div>
               <div className="text-xs text-muted-foreground space-y-0.5">
-                <div>λ = 0.969</div>
-                <div>N<sub>e</sub> = 43</div>
+                <div>λ = {ctx.lambda.toFixed(3)}</div>
+                <div>N<sub>e</sub> = {Math.round(ctx.ne)}</div>
               </div>
-              <MiniSparkline data={[45, 44, 43, 44, 43, 42, 43, 44, 43, 45]} color="#c49a2a" />
+              <MiniSparkline data={sparkData} color="#c49a2a" />
             </div>
+            {ctx.harvestedThisSeason.rotwild > 0 && (
+              <div className="text-[10px] text-muted-foreground">
+                Strecke: {ctx.harvestedThisSeason.rotwild} Rotwild entnommen
+              </div>
+            )}
           </div>
 
           {/* Card 2: Habitat-Qualität */}
@@ -370,33 +441,82 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Card 3: Compliance */}
+          {/* Card 3: Wetter */}
+          <div
+            className="rounded-lg border border-[hsl(110,25%,18%)] bg-[hsl(130,20%,10%)] p-5 space-y-3 cursor-pointer hover:border-[#c49a2a]/40 transition-colors"
+            onClick={() => handleQuickLink("/wetter")}
+            data-testid="card-status-weather"
+          >
+            <div className="flex items-center gap-2">
+              <CloudRain className="h-4 w-4 text-sky-400" />
+              <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
+                Wetter
+              </span>
+            </div>
+            {ctx.currentTemp !== null && ctx.weatherCode !== null ? (
+              <div className="flex items-center gap-3">
+                <span className="text-2xl">{wmoEmoji(ctx.weatherCode)}</span>
+                <div>
+                  <span className="text-2xl font-mono font-bold text-foreground">{ctx.currentTemp}°C</span>
+                  <p className="text-[11px] text-muted-foreground">{wmoDescription(ctx.weatherCode)}</p>
+                </div>
+              </div>
+            ) : ctx.weatherLoading ? (
+              <div className="text-xs text-muted-foreground animate-pulse">Lade Wetter…</div>
+            ) : (
+              <div className="text-xs text-muted-foreground">Nicht verfügbar</div>
+            )}
+            {ctx.currentWind && ctx.currentWindSpeed !== null && (
+              <div className="flex items-center gap-1 text-[11px] text-muted-foreground">
+                <Thermometer className="h-3 w-3" />
+                Wind: {ctx.currentWind} {ctx.currentWindSpeed} km/h
+              </div>
+            )}
+          </div>
+
+          {/* Card 4: Compliance */}
           <div
             className="rounded-lg border border-[hsl(110,25%,18%)] bg-[hsl(130,20%,10%)] p-5 space-y-3 cursor-pointer hover:border-[#c49a2a]/40 transition-colors"
             onClick={() => handleQuickLink("/philosophie")}
             data-testid="card-status-compliance"
           >
             <div className="flex items-center gap-2">
-              <ShieldCheck className="h-4 w-4 text-[#4a9e4a]" />
+              <ShieldCheck className="h-4 w-4" style={{ color: complianceColor }} />
               <span className="text-xs font-semibold uppercase tracking-wider text-foreground">
                 Compliance
               </span>
             </div>
             <div className="flex items-baseline gap-3">
-              <span className="text-2xl font-mono font-bold text-[#4a9e4a]">25/25</span>
+              <span className="text-2xl font-mono font-bold" style={{ color: complianceColor }}>
+                {compliancePassed}/{complianceTotal}
+              </span>
               <span className="text-xs text-muted-foreground">Grundsätze</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
               <span
                 className="inline-block px-2 py-0.5 rounded text-[10px] font-medium"
-                style={{ background: "#c49a2a20", color: "#c49a2a", border: "1px solid #c49a2a40" }}
+                style={{
+                  background: `${complianceColor}20`,
+                  color: complianceColor,
+                  border: `1px solid ${complianceColor}40`,
+                }}
               >
-                1 Blocker aktiv
+                {complianceText}
               </span>
-              <span className="text-muted-foreground">Zone A</span>
             </div>
           </div>
         </div>
+
+        {/* Letzte Strecke */}
+        {ctx.harvestedThisSeason.lastDate && (
+          <div className="mt-4 flex items-center justify-center gap-3">
+            <Target className="h-3.5 w-3.5 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">
+              Letzte Strecke: {ctx.harvestedThisSeason.lastSpecies} am {ctx.harvestedThisSeason.lastDate} ·
+              Saison gesamt: {ctx.harvestedThisSeason.total} Stück ({ctx.harvestedThisSeason.male}♂ / {ctx.harvestedThisSeason.female}♀)
+            </span>
+          </div>
+        )}
       </section>
 
       {/* ─── Quick-Links (3×2) ─── */}
@@ -423,8 +543,11 @@ export default function Landing() {
 
       {/* ─── Footer ─── */}
       <footer className="px-6 pb-8 text-center space-y-1">
+        <p className="text-[10px] text-muted-foreground/40">
+          Aktualisiert: {ctx.updatedAt.toLocaleString("de-DE", { timeZone: "Europe/Berlin" })}
+        </p>
         <p className="text-[10px] text-muted-foreground/60 tracking-wide">
-          v2.1.0 · Rotwild-A1 · Wissenschaftlich fundiert · Gaillard et al. 2000 · Carpio et al. 2021 · Laumeier et al. 2025
+          v2.2.0 · Rotwild-A1 · Wissenschaftlich fundiert · Gaillard et al. 2000 · Carpio et al. 2021 · Laumeier et al. 2025
         </p>
         <p className="text-[10px] text-muted-foreground/40">
           © 2026 Jagdhandbuch Merschbach
