@@ -10,6 +10,7 @@ import Population from "@/pages/population";
 import Habitat from "@/pages/habitat";
 import Genetics from "@/pages/genetics";
 import Health from "@/pages/health";
+import Wildschaden from "@/pages/wildschaden";
 import NotFound from "@/pages/not-found";
 
 function AppRouter() {
@@ -18,6 +19,7 @@ function AppRouter() {
       <Route path="/" component={Population} />
       <Route path="/habitat" component={Habitat} />
       <Route path="/genetics" component={Genetics} />
+      <Route path="/wildschaden" component={Wildschaden} />
       <Route path="/health" component={Health} />
       <Route component={NotFound} />
     </Switch>

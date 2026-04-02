@@ -14,9 +14,10 @@ import type { MonteCarloResult } from "@/lib/models/population";
 interface FanChartProps {
   mcResult: MonteCarloResult;
   K: number;
+  stochastic?: boolean;
 }
 
-export function FanChart({ mcResult, K }: FanChartProps) {
+export function FanChart({ mcResult, K, stochastic = true }: FanChartProps) {
   const data = mcResult.years.map((year, i) => ({
     year,
     median: mcResult.median[i],
@@ -77,37 +78,43 @@ export function FanChart({ mcResult, K }: FanChartProps) {
           />
 
           {/* 95% confidence band */}
-          <Area
-            type="monotone"
-            dataKey="band95"
-            stroke="none"
-            fill="#2d5016"
-            fillOpacity={0.15}
-            dot={false}
-            activeDot={false}
-          />
+          {stochastic && (
+            <Area
+              type="monotone"
+              dataKey="band95"
+              stroke="none"
+              fill="#2d5016"
+              fillOpacity={0.15}
+              dot={false}
+              activeDot={false}
+            />
+          )}
 
           {/* 90% confidence band */}
-          <Area
-            type="monotone"
-            dataKey="band90"
-            stroke="none"
-            fill="#3a6a1a"
-            fillOpacity={0.2}
-            dot={false}
-            activeDot={false}
-          />
+          {stochastic && (
+            <Area
+              type="monotone"
+              dataKey="band90"
+              stroke="none"
+              fill="#3a6a1a"
+              fillOpacity={0.2}
+              dot={false}
+              activeDot={false}
+            />
+          )}
 
           {/* 50% confidence band */}
-          <Area
-            type="monotone"
-            dataKey="band50"
-            stroke="none"
-            fill="#4a9e4a"
-            fillOpacity={0.35}
-            dot={false}
-            activeDot={false}
-          />
+          {stochastic && (
+            <Area
+              type="monotone"
+              dataKey="band50"
+              stroke="none"
+              fill="#4a9e4a"
+              fillOpacity={0.35}
+              dot={false}
+              activeDot={false}
+            />
+          )}
 
           {/* K line */}
           <ReferenceLine
@@ -137,20 +144,24 @@ export function FanChart({ mcResult, K }: FanChartProps) {
       <div className="flex justify-center gap-4 mt-1 text-[10px] text-muted-foreground">
         <span className="flex items-center gap-1.5">
           <span className="w-4 h-0.5 bg-[#4a9e4a] rounded" />
-          Median
+          {stochastic ? "Median" : "Deterministisch"}
         </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-4 h-2 bg-[#4a9e4a] opacity-35 rounded-sm" />
-          50% KI
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-4 h-2 bg-[#3a6a1a] opacity-20 rounded-sm" />
-          90% KI
-        </span>
-        <span className="flex items-center gap-1.5">
-          <span className="w-4 h-2 bg-[#2d5016] opacity-15 rounded-sm" />
-          95% KI
-        </span>
+        {stochastic && (
+          <>
+            <span className="flex items-center gap-1.5">
+              <span className="w-4 h-2 bg-[#4a9e4a] opacity-35 rounded-sm" />
+              50% KI
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-4 h-2 bg-[#3a6a1a] opacity-20 rounded-sm" />
+              90% KI
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-4 h-2 bg-[#2d5016] opacity-15 rounded-sm" />
+              95% KI
+            </span>
+          </>
+        )}
         <span className="flex items-center gap-1.5">
           <span
             className="w-4 h-0.5 rounded"

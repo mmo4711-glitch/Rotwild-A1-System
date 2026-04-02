@@ -1,5 +1,5 @@
 import { Link, useLocation } from "wouter";
-import { BarChart3, Map, Dna, Activity } from "lucide-react";
+import { BarChart3, Map, Dna, Activity, ShieldAlert } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -17,6 +17,7 @@ const navItems = [
   { title: "Populationsdynamik", url: "/", icon: BarChart3 },
   { title: "Habitatbewertung", url: "/habitat", icon: Map },
   { title: "Ne-Genetik", url: "/genetics", icon: Dna },
+  { title: "Wildschaden", url: "/wildschaden", icon: ShieldAlert },
   { title: "System-Health", url: "/health", icon: Activity },
 ];
 
