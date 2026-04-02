@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
+import Handbuch from "@/pages/handbuch";
+import Philosophie from "@/pages/philosophie";
 import Population from "@/pages/population";
 import Habitat from "@/pages/habitat";
 import Genetics from "@/pages/genetics";
@@ -19,6 +21,9 @@ function AppRouter() {
   return (
     <Switch>
       <Route path="/" component={Population} />
+      <Route path="/handbuch" component={Handbuch} />
+      <Route path="/handbuch/:chapter" component={Handbuch} />
+      <Route path="/philosophie" component={Philosophie} />
       <Route path="/habitat" component={Habitat} />
       <Route path="/genetics" component={Genetics} />
       <Route path="/wildschaden" component={Wildschaden} />
