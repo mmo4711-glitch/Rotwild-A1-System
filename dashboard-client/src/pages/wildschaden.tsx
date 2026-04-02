@@ -21,6 +21,7 @@ import {
   TreePine,
   Snowflake,
   Info,
+  Target,
 } from "lucide-react";
 import {
   MERSCHBACH_DEFAULTS,
@@ -143,6 +144,15 @@ export default function Wildschaden() {
   }, [currentState, msy.absolute, isLowPop]);
 
   const totalHarvest = harvestRows.reduce((sum, r) => sum + r.entnahme, 0);
+
+  // Jahresabschussplan data
+  const abschussplanRows = [
+    { wildart: "Rotwild", klasse: "Kälber", bestand: 10, zuwachs: "—", abgang: 3, empfehlung: 2, maennlich: 1, weiblich: 1 },
+    { wildart: "Rotwild", klasse: "Jährlinge", bestand: 8, zuwachs: "7", abgang: 1, empfehlung: 1, maennlich: 1, weiblich: 0 },
+    { wildart: "Rotwild", klasse: "Adulte", bestand: 20, zuwachs: "—", abgang: 1, empfehlung: 0, maennlich: 0, weiblich: 0 },
+    { wildart: "Rotwild", klasse: "Alte", bestand: 7, zuwachs: "—", abgang: 2, empfehlung: 0, maennlich: 0, weiblich: 0 },
+  ];
+  const abschussplanGesamt = { bestand: 45, zuwachs: "7", abgang: 7, empfehlung: 3, maennlich: 2, weiblich: 1 };
 
   return (
     <div className="p-4 space-y-4" data-testid="page-wildschaden">
@@ -450,6 +460,141 @@ export default function Wildschaden() {
               })}
             </div>
           )}
+        </CardContent>
+      </Card>
+
+      {/* === Section C: Jahresabschussplan === */}
+      <Card className="bg-card border-card-border print-abschussplan" data-testid="card-jahresabschussplan">
+        <CardHeader className="pb-2 pt-3 px-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm font-medium text-foreground flex items-center gap-2">
+              <Target className="h-4 w-4 text-[#c49a2a]" />
+              Jahresabschussplan
+            </CardTitle>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => window.print()}
+              className="text-xs print-hide"
+              data-testid="button-print-abschussplan"
+            >
+              <Printer className="h-3.5 w-3.5 mr-1.5" />
+              Abschussplan drucken
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent className="px-4 pb-4 space-y-4">
+          {/* Print Header */}
+          <div className="text-center space-y-1">
+            <h3 className="text-base font-display font-semibold tracking-wide text-[#c49a2a] print-title">
+              JAHRESABSCHUSSPLAN 2026/2027
+            </h3>
+            <p className="text-xs text-muted-foreground print-subtitle">
+              Eigenjagdbezirk Merschbach · Landkreis Bernkastel-Wittlich
+            </p>
+          </div>
+
+          {/* Abschussplan Table */}
+          <div className="rounded-lg border border-card-border overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="border-card-border hover:bg-transparent">
+                  <TableHead className="text-xs text-muted-foreground">Wildart</TableHead>
+                  <TableHead className="text-xs text-muted-foreground">Klasse</TableHead>
+                  <TableHead className="text-xs text-muted-foreground text-right">Bestand (Schätzung)</TableHead>
+                  <TableHead className="text-xs text-muted-foreground text-right">Zuwachs</TableHead>
+                  <TableHead className="text-xs text-muted-foreground text-right">Abgang (natürl.)</TableHead>
+                  <TableHead className="text-xs text-muted-foreground text-right">Abschuss-Empfehlung</TableHead>
+                  <TableHead className="text-xs text-muted-foreground text-right">Davon ♂</TableHead>
+                  <TableHead className="text-xs text-muted-foreground text-right">Davon ♀</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {abschussplanRows.map((row) => (
+                  <TableRow key={row.klasse} className="border-card-border">
+                    <TableCell className="text-sm text-foreground">{row.wildart}</TableCell>
+                    <TableCell className="text-sm font-medium text-foreground">{row.klasse}</TableCell>
+                    <TableCell className="text-sm font-mono text-right text-foreground">{row.bestand}</TableCell>
+                    <TableCell className="text-sm font-mono text-right text-muted-foreground">{row.zuwachs}</TableCell>
+                    <TableCell className="text-sm font-mono text-right text-muted-foreground">{row.abgang}</TableCell>
+                    <TableCell className="text-sm font-mono text-right font-semibold" style={{ color: "#c49a2a" }}>
+                      {row.empfehlung}
+                    </TableCell>
+                    <TableCell className="text-sm font-mono text-right text-foreground">{row.maennlich}</TableCell>
+                    <TableCell className="text-sm font-mono text-right text-foreground">{row.weiblich}</TableCell>
+                  </TableRow>
+                ))}
+                {/* Gesamt row */}
+                <TableRow className="border-card-border bg-background/50">
+                  <TableCell className="text-sm font-semibold text-foreground">Rotwild</TableCell>
+                  <TableCell className="text-sm font-semibold text-foreground">Gesamt</TableCell>
+                  <TableCell className="text-sm font-mono font-semibold text-right text-foreground">{abschussplanGesamt.bestand}</TableCell>
+                  <TableCell className="text-sm font-mono font-semibold text-right text-foreground">{abschussplanGesamt.zuwachs}</TableCell>
+                  <TableCell className="text-sm font-mono font-semibold text-right text-foreground">{abschussplanGesamt.abgang}</TableCell>
+                  <TableCell className="text-sm font-mono font-semibold text-right" style={{ color: "#c49a2a" }}>{abschussplanGesamt.empfehlung}</TableCell>
+                  <TableCell className="text-sm font-mono font-semibold text-right text-foreground">{abschussplanGesamt.maennlich}</TableCell>
+                  <TableCell className="text-sm font-mono font-semibold text-right text-foreground">{abschussplanGesamt.weiblich}</TableCell>
+                </TableRow>
+              </TableBody>
+            </Table>
+          </div>
+
+          {/* Constraints section */}
+          <div className="space-y-2">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground">Auflagen & Einschränkungen</h4>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 text-xs">
+                <CheckCircle className="h-3.5 w-3.5 text-[#4a9e4a] shrink-0" />
+                <span className="text-foreground">G22 Status:</span>
+                <span className="text-muted-foreground">Kein Nullentnahme-Trigger (N/K = 71%)</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <AlertTriangle className="h-3.5 w-3.5 text-[#c49a2a] shrink-0" />
+                <span className="text-foreground">G23 Status:</span>
+                <span className="text-muted-foreground">Muttertierschutz Mai–Oktober aktiv</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <CheckCircle className="h-3.5 w-3.5 text-[#4a9e4a] shrink-0" />
+                <span className="text-foreground">G15 Status:</span>
+                <span className="text-muted-foreground">Adulter Weibchenanteil über Schwelle</span>
+              </div>
+              <div className="flex items-center gap-2 text-xs">
+                <Info className="h-3.5 w-3.5 text-[#5b7a8a] shrink-0" />
+                <span className="text-foreground">Sektorrotation:</span>
+                <span className="text-muted-foreground">7/21-Intervall aktiv</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Note about λ */}
+          <div className="p-2.5 rounded-lg border border-card-border bg-background">
+            <p className="text-[10px] text-muted-foreground">
+              Hinweis: Bei λ=0.969 ist die Population leicht rückläufig. Die Abschussempfehlung ist daher minimal gehalten,
+              um den Bestandsaufbau nicht zu gefährden. Basierend auf Leslie-Matrix-Projektion mit dichteabhängiger Regulation (Bonenfant et al. 2009).
+            </p>
+          </div>
+
+          {/* Signature lines */}
+          <div className="space-y-4 pt-4 border-t border-card-border">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground">Unterschriften</h4>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="space-y-2">
+                <div className="text-xs text-foreground">Jagdpächter:</div>
+                <div className="border-b border-muted-foreground/30 pb-1 min-h-[24px]"></div>
+                <div className="text-[10px] text-muted-foreground">Datum: _________________</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs text-foreground">Hegeleiter:</div>
+                <div className="border-b border-muted-foreground/30 pb-1 min-h-[24px]"></div>
+                <div className="text-[10px] text-muted-foreground">Datum: _________________</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-xs text-foreground">Untere Jagdbehörde:</div>
+                <div className="border-b border-muted-foreground/30 pb-1 min-h-[24px]"></div>
+                <div className="text-[10px] text-muted-foreground">Datum: _________________</div>
+              </div>
+            </div>
+          </div>
         </CardContent>
       </Card>
     </div>

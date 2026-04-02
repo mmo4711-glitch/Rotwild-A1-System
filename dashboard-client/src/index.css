@@ -181,6 +181,89 @@
   color: #c49a2a !important;
 }
 
+/* ─── Print styles for Jahresabschussplan ─── */
+@media print {
+  /* Hide everything except the Abschussplan card */
+  body {
+    background: white !important;
+    color: black !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  html {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Hide sidebar, header, and non-print elements */
+  [data-testid="sidebar"],
+  [data-testid="button-sidebar-toggle"],
+  header,
+  .print-hide {
+    display: none !important;
+  }
+
+  /* Reset the layout */
+  main {
+    overflow: visible !important;
+  }
+
+  /* Hide all cards except the Abschussplan */
+  [data-testid="page-wildschaden"] > *:not(.print-abschussplan) {
+    display: none !important;
+  }
+
+  [data-testid="page-wildschaden"] > h2,
+  [data-testid="page-wildschaden"] > .flex.items-baseline {
+    display: none !important;
+  }
+
+  /* Style the Abschussplan for print */
+  .print-abschussplan {
+    border: none !important;
+    background: white !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .print-abschussplan * {
+    color: black !important;
+    border-color: #333 !important;
+  }
+
+  .print-abschussplan .print-title {
+    color: black !important;
+    font-size: 18px !important;
+  }
+
+  .print-abschussplan .print-subtitle {
+    color: #333 !important;
+  }
+
+  .print-abschussplan table {
+    border-collapse: collapse !important;
+  }
+
+  .print-abschussplan th,
+  .print-abschussplan td {
+    border: 1px solid #333 !important;
+    padding: 4px 8px !important;
+    color: black !important;
+  }
+
+  .print-abschussplan th {
+    background: #f0f0f0 !important;
+    font-weight: 600 !important;
+  }
+
+  /* Signature lines in print */
+  .print-abschussplan .border-b {
+    border-bottom: 1px solid black !important;
+  }
+}
+
 @layer utilities {
   input[type="search"]::-webkit-search-cancel-button {
     @apply hidden;
