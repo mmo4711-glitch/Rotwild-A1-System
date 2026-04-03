@@ -539,7 +539,7 @@ export default function Strecke() {
                 </div>
 
                 {/* Content Grid */}
-                <div className="grid grid-cols-2 gap-3 text-xs mb-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs mb-4">
                   <div>
                     <span className="text-[10px] text-muted-foreground uppercase tracking-wider block print:text-gray-500">Gastjäger</span>
                     <span className="font-semibold">{bName}</span>

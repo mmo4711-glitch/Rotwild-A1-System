@@ -247,7 +247,7 @@ export default function Population() {
       )}
 
       {/* KPI Cards */}
-      <div className="grid grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <KPICard
           icon={<Users className="h-4 w-4" />}
           label="Bestand N"
@@ -294,7 +294,7 @@ export default function Population() {
       </div>
 
       {/* Charts row */}
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
         <Card className="bg-card border-card-border">
           <CardHeader className="pb-2 pt-3 px-4">
             <CardTitle className="text-sm font-medium text-foreground">
@@ -327,7 +327,7 @@ export default function Population() {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
-          <div className="grid grid-cols-5 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
             <div className="space-y-2">
               <Label className="text-xs text-muted-foreground">
                 Entnahmerate: {harvestRate.toFixed(0)}%
@@ -412,7 +412,7 @@ export default function Population() {
       )}
 
       {/* === NEW: 3 Analysis Cards === */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {/* Card A: λ-Zeitreihe */}
         <Card className="bg-card border-card-border">
           <CardHeader className="pb-2 pt-3 px-4">

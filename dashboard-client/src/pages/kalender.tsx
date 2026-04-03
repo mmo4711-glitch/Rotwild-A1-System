@@ -311,8 +311,8 @@ export default function Kalender() {
 
           {/* Calendar Grid */}
           <Card className="border-[hsl(110,25%,18%)]">
-            <CardContent className="p-3">
-              <div className="grid grid-cols-7 gap-1">
+            <CardContent className="p-3 overflow-x-auto">
+              <div className="grid grid-cols-7 gap-1 min-w-[500px]">
                 {WEEKDAYS.map((wd) => (
                   <div key={wd} className="text-center text-[10px] font-semibold text-muted-foreground py-1 uppercase tracking-wider">
                     {wd}

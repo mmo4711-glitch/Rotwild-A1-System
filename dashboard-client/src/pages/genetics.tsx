@@ -50,7 +50,7 @@ export default function Genetics() {
         <span className="text-xs text-muted-foreground">Effektive Populationsgröße</span>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
         {/* Calculator */}
         <Card className="bg-card border-card-border">
           <CardHeader className="pb-2 pt-3 px-4">
@@ -184,7 +184,7 @@ export default function Genetics() {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
-          <div className="grid grid-cols-2 gap-6 text-xs text-muted-foreground">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 text-xs text-muted-foreground">
             <div className="space-y-2">
               <h4 className="text-foreground font-medium text-sm">Lokale Population</h4>
               <p>

@@ -51,9 +51,9 @@ export default function Habitat() {
         <span className="text-xs text-muted-foreground">HSI-Modell · 6 Kovariaten</span>
       </div>
 
-      <div className="flex-1 grid grid-cols-[1fr_320px] gap-3 min-h-0">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-3 min-h-0">
         {/* Map */}
-        <Card className="bg-card border-card-border overflow-hidden">
+        <Card className="bg-card border-card-border overflow-hidden min-h-[300px] lg:min-h-0">
           <CardContent className="p-0 h-full">
             <HSIMap
               zoneHSIs={zoneHSIs}

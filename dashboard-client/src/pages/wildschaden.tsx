@@ -217,7 +217,7 @@ export default function Wildschaden() {
           </CardTitle>
         </CardHeader>
         <CardContent className="px-4 pb-4">
-          <div className="grid grid-cols-[1fr_300px] gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-6">
             {/* Sliders */}
             <div className="space-y-5">
               <div className="space-y-2">
@@ -429,7 +429,7 @@ export default function Wildschaden() {
           </div>
 
           {/* Harvest table */}
-          <div className="rounded-lg border border-card-border overflow-hidden">
+          <div className="rounded-lg border border-card-border overflow-hidden overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-card-border hover:bg-transparent">
@@ -539,7 +539,7 @@ export default function Wildschaden() {
           </div>
 
           {/* Abschussplan Table */}
-          <div className="rounded-lg border border-card-border overflow-hidden">
+          <div className="rounded-lg border border-card-border overflow-hidden overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow className="border-card-border hover:bg-transparent">

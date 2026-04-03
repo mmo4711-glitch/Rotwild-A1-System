@@ -282,9 +282,9 @@ export default function Health() {
         </span>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         {/* Service status */}
-        <Card className="bg-card border-card-border col-span-2">
+        <Card className="bg-card border-card-border md:col-span-2">
           <CardHeader className="pb-2 pt-3 px-4">
             <CardTitle className="text-sm font-medium text-foreground">Dienststatus</CardTitle>
           </CardHeader>
