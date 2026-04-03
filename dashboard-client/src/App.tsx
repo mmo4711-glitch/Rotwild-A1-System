@@ -23,6 +23,8 @@ import Wetter from "@/pages/wetter";
 import Wildkamera from "@/pages/wildkamera";
 import Tagebuch from "@/pages/tagebuch";
 import Wildwiesen from "@/pages/wildwiesen";
+import Drueckjagd from "@/pages/drueckjagd";
+import Vergleich from "@/pages/vergleich";
 import NotFound from "@/pages/not-found";
 
 function AppRouter() {
@@ -42,6 +44,8 @@ function AppRouter() {
       <Route path="/wildkamera" component={Wildkamera} />
       <Route path="/tagebuch" component={Tagebuch} />
       <Route path="/wildwiesen" component={Wildwiesen} />
+      <Route path="/drueckjagd" component={Drueckjagd} />
+      <Route path="/vergleich" component={Vergleich} />
       <Route path="/health" component={Health} />
       <Route path="/architektur" component={Architektur} />
       <Route component={NotFound} />

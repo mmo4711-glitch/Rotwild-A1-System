@@ -15,6 +15,8 @@ import {
   Sprout,
   Activity,
   Layers,
+  TrendingUp,
+  Users,
 } from "lucide-react";
 import {
   Sidebar,
@@ -55,6 +57,7 @@ const navGroups: NavGroup[] = [
       { title: "Habitatbewertung", url: "/habitat", icon: Map },
       { title: "Ne-Genetik", url: "/genetics", icon: Dna },
       { title: "Wildschaden", url: "/wildschaden", icon: ShieldAlert },
+      { title: "Jahresvergleich", url: "/vergleich", icon: TrendingUp },
     ],
   },
   {
@@ -66,6 +69,7 @@ const navGroups: NavGroup[] = [
       { title: "Wildkamera", url: "/wildkamera", icon: Camera },
       { title: "Reviertagebuch", url: "/tagebuch", icon: BookMarked },
       { title: "Wildwiesen", url: "/wildwiesen", icon: Sprout },
+      { title: "Drückjagd", url: "/drueckjagd", icon: Users },
     ],
   },
   {
