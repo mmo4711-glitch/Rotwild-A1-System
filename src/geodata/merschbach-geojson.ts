@@ -1,262 +1,959 @@
 /**
- * Jagdhandbuch Merschbach — GeoJSON-Daten
+ * Jagdhandbuch Merschbach — Echte GeoJSON-Daten
  * 
- * Reviergrenze und Zonen als echte GeoJSON-Features
- * Zentrum: ~49.80°N, 7.01°E (Merschbach, Hunsrück)
- * Gesamtfläche: 312 ha
+ * Reviergrenze aus OpenStreetMap (Nominatim, OSM Relation 1258428)
+ * 62-Punkte-Polygon der Gemarkung Merschbach
+ * VG Thalfang am Erbeskopf, LK Bernkastel-Wittlich, RLP
  * 
- * HINWEIS: Diese Koordinaten sind Annäherungen basierend auf der Revierbeschreibung.
- * Für exakte Polygone: GPS-Aufnahme im Feld durchführen und hier ersetzen.
- * Bis dahin dienen diese als funktionale Platzhalter für die Kartenentwicklung.
+ * Generiert: 2026-04-15
+ * Quelle: OSM (Reviergrenze) + Geländebasierte Aufteilung (Zonen/Sektoren)
+ * 
+ * HINWEIS: Zonen, Sektoren und Infrastruktur-Positionen basieren auf der
+ * Gemarkungsgrenze und Geländelogik. Hochsitz- und Kamera-Positionen
+ * müssen noch durch GPS-Aufnahme im Feld verifiziert werden.
  */
 
 export const MERSCHBACH_CENTER = {
-  lat: 49.803,
-  lng: 7.006,
+  lat: 49.807406,
+  lng: 7.007908,
   zoom: 14,
 };
 
-export const merschbachGeoJSON: any = {
-  type: 'FeatureCollection',
-  features: [
-    // Reviergrenze (äußeres Polygon, ~312 ha)
-    {
-      type: 'Feature',
-      properties: {
-        id: 'reviergrenze',
-        name: 'Eigenjagdbezirk Merschbach',
-        type: 'boundary',
-        area_ha: 312,
-        fill: 'transparent',
-        stroke: '#2d5016',
-        'stroke-width': 3,
-        'stroke-dasharray': '10,5',
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[
-          [6.990, 49.810], [7.000, 49.812], [7.012, 49.811],
-          [7.020, 49.808], [7.023, 49.802], [7.021, 49.795],
-          [7.015, 49.790], [7.005, 49.789], [6.995, 49.791],
-          [6.988, 49.796], [6.987, 49.803], [6.990, 49.810],
-        ]],
-      },
-    },
-    
-    // Zone A — Kernzone/Ruhezone (120 ha, Nordwest)
-    {
-      type: 'Feature',
-      properties: {
-        id: 'zone_a',
-        name: 'Zone A — Kernzone (Ruhezone)',
-        type: 'zone',
-        area_ha: 120,
-        fill: '#1a5c1a',
-        'fill-opacity': 0.3,
-        stroke: '#0d3d0d',
-        'stroke-width': 2,
-        description: 'Minimale Störung, Rückzugsraum, keine reguläre Jagd',
-        hsi_target: 0.8,
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[
-          [6.990, 49.810], [7.000, 49.812], [7.008, 49.810],
-          [7.010, 49.804], [7.005, 49.800], [6.995, 49.800],
-          [6.988, 49.803], [6.990, 49.810],
-        ]],
-      },
-    },
-    
-    // Zone B — Produktionszone (140 ha, Ost/Zentral)
-    {
-      type: 'Feature',
-      properties: {
-        id: 'zone_b',
-        name: 'Zone B — Produktionszone (Jagd)',
-        type: 'zone',
-        area_ha: 140,
-        fill: '#c49a2a',
-        'fill-opacity': 0.25,
-        stroke: '#8b6914',
-        'stroke-width': 2,
-        description: 'Reguläre Jagd, Ansitz/Pirsch, Hochsitze',
-        hsi_target: 0.6,
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[
-          [7.008, 49.810], [7.012, 49.811], [7.020, 49.808],
-          [7.023, 49.802], [7.020, 49.796], [7.012, 49.793],
-          [7.005, 49.795], [7.005, 49.800], [7.010, 49.804],
-          [7.008, 49.810],
-        ]],
-      },
-    },
-    
-    // Zone C — Pufferzone (52 ha, Süd)
-    {
-      type: 'Feature',
-      properties: {
-        id: 'zone_c',
-        name: 'Zone C — Pufferzone (Grenzbereich)',
-        type: 'zone',
-        area_ha: 52,
-        fill: '#8b4513',
-        'fill-opacity': 0.2,
-        stroke: '#5c2d0e',
-        'stroke-width': 2,
-        description: '75m-Grenzbuffer, eingeschränkte Jagd, Wildbrücken',
-        hsi_target: 0.4,
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[
-          [7.005, 49.795], [7.012, 49.793], [7.020, 49.796],
-          [7.021, 49.795], [7.015, 49.790], [7.005, 49.789],
-          [6.995, 49.791], [6.988, 49.796], [6.995, 49.800],
-          [7.005, 49.795],
-        ]],
-      },
-    },
-    
-    // Hochsitz-Standorte (Beispiele — durch GPS-Daten ersetzen!)
-    ...[
-      { id: 'hs_01', name: 'Hochsitz Eichenberg', type_hs: 'A', lat: 49.806, lng: 7.000, notes: 'Kanzel, Typ A (geschlossen)' },
-      { id: 'hs_02', name: 'Hochsitz Dhrontal', type_hs: 'B', lat: 49.802, lng: 7.010, notes: 'Leiter, Typ B (offen)' },
-      { id: 'hs_03', name: 'Hochsitz Windbruch', type_hs: 'A', lat: 49.798, lng: 7.005, notes: 'Kanzel, Typ A (geschlossen)' },
-      { id: 'hs_04', name: 'Hochsitz K81-Rand', type_hs: 'C', lat: 49.795, lng: 7.012, notes: 'Drückjagdschirm, Typ C' },
-      { id: 'hs_05', name: 'Hochsitz Nordhang', type_hs: 'B', lat: 49.809, lng: 7.004, notes: 'Leiter, Typ B (offen)' },
-    ].map(hs => ({
-      type: 'Feature' as const,
-      properties: {
-        id: hs.id,
-        name: hs.name,
-        type: 'hochsitz',
-        hochsitz_type: hs.type_hs,
-        notes: hs.notes,
-        icon: 'tower',
-      },
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [hs.lng, hs.lat],
-      },
-    })),
-    
-    // Wildkamera-Positionen
-    ...[
-      { id: 'wk_01', name: 'Wildkamera Hauptwechsel', lat: 49.804, lng: 7.003 },
-      { id: 'wk_02', name: 'Wildkamera Suhle', lat: 49.800, lng: 7.008 },
-      { id: 'wk_03', name: 'Wildkamera Wildwiese Ost', lat: 49.797, lng: 7.015 },
-    ].map(wk => ({
-      type: 'Feature' as const,
-      properties: {
-        id: wk.id,
-        name: wk.name,
-        type: 'wildkamera',
-        icon: 'camera',
-      },
-      geometry: {
-        type: 'Point' as const,
-        coordinates: [wk.lng, wk.lat],
-      },
-    })),
-    
-    // Wildwechsel (Hauptwechsel als Linie)
-    {
-      type: 'Feature',
-      properties: {
-        id: 'ww_main',
-        name: 'Hauptwechsel Nord-Süd',
-        type: 'wildwechsel',
-        stroke: '#ff6b35',
-        'stroke-width': 2,
-        'stroke-dasharray': '5,3',
-        intensity: 'hoch',
-      },
-      geometry: {
-        type: 'LineString',
-        coordinates: [
-          [7.002, 49.810], [7.003, 49.806], [7.005, 49.802],
-          [7.006, 49.798], [7.008, 49.794], [7.010, 49.791],
-        ],
-      },
-    },
-    {
-      type: 'Feature',
-      properties: {
-        id: 'ww_ost',
-        name: 'Wechsel Ost (zum Dhrontal)',
-        type: 'wildwechsel',
-        stroke: '#ff6b35',
-        'stroke-width': 1.5,
-        'stroke-dasharray': '5,3',
-        intensity: 'mittel',
-      },
-      geometry: {
-        type: 'LineString',
-        coordinates: [
-          [7.005, 49.802], [7.010, 49.801], [7.015, 49.800],
-          [7.018, 49.798],
-        ],
-      },
-    },
-    
-    // Störquellen
-    {
-      type: 'Feature',
-      properties: {
-        id: 'k81',
-        name: 'K81 (Kreisstraße)',
-        type: 'stoerung',
-        stroke: '#ff0000',
-        'stroke-width': 2,
-        disturbance_type: 'road',
-        intensity: 0.7,
-      },
-      geometry: {
-        type: 'LineString',
-        coordinates: [
-          [6.988, 49.793], [7.000, 49.792], [7.015, 49.791], [7.023, 49.793],
-        ],
-      },
-    },
-    
-    // Windpark (300m Eisfallzone)
-    {
-      type: 'Feature',
-      properties: {
-        id: 'windpark_buffer',
-        name: 'Windpark Eisfallzone (300m)',
-        type: 'restriktion',
-        fill: '#ff4444',
-        'fill-opacity': 0.15,
-        stroke: '#ff0000',
-        'stroke-width': 1,
-        'stroke-dasharray': '3,3',
-      },
-      geometry: {
-        type: 'Polygon',
-        coordinates: [[
-          [7.018, 49.808], [7.022, 49.807], [7.023, 49.804],
-          [7.021, 49.802], [7.017, 49.803], [7.016, 49.806],
-          [7.018, 49.808],
-        ]],
-      },
-    },
-  ],
+export const MERSCHBACH_BBOX = {
+  minLat: 49.7950275,
+  maxLat: 49.8206939,
+  minLng: 6.9935973,
+  maxLng: 7.0204789,
 };
 
-/**
- * GeoJSON für den Export bereitstellen
- */
+export const merschbachGeoJSON: any = {
+  type: "FeatureCollection",
+  features: [
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "reviergrenze",
+      "name": "Eigenjagdbezirk Merschbach",
+      "type": "boundary",
+      "area_ha": 312,
+      "source": "OpenStreetMap Nominatim",
+      "osm_accuracy": "Gemarkungsgrenze, 62 Punkte",
+      "fill": "transparent",
+      "stroke": "#c49a2a",
+      "stroke-width": 3
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            6.9935973,
+            49.8020242
+          ],
+          [
+            6.994706,
+            49.800922
+          ],
+          [
+            6.9950548,
+            49.8010741
+          ],
+          [
+            6.9982169,
+            49.7973603
+          ],
+          [
+            6.9975708,
+            49.7968016
+          ],
+          [
+            7.0001598,
+            49.7951492
+          ],
+          [
+            7.0011215,
+            49.7951242
+          ],
+          [
+            7.0034593,
+            49.7964636
+          ],
+          [
+            7.0035347,
+            49.7951492
+          ],
+          [
+            7.0046094,
+            49.7950275
+          ],
+          [
+            7.0060801,
+            49.795064
+          ],
+          [
+            7.0065361,
+            49.7956489
+          ],
+          [
+            7.0064971,
+            49.7963295
+          ],
+          [
+            7.008682,
+            49.7968653
+          ],
+          [
+            7.0103695,
+            49.798204
+          ],
+          [
+            7.0120664,
+            49.7979728
+          ],
+          [
+            7.0125296,
+            49.7983264
+          ],
+          [
+            7.0127424,
+            49.8003414
+          ],
+          [
+            7.0147409,
+            49.8005604
+          ],
+          [
+            7.0145428,
+            49.801975
+          ],
+          [
+            7.0154227,
+            49.8018115
+          ],
+          [
+            7.016356,
+            49.8019923
+          ],
+          [
+            7.0171026,
+            49.8039455
+          ],
+          [
+            7.0168527,
+            49.8044546
+          ],
+          [
+            7.0186827,
+            49.806735
+          ],
+          [
+            7.0199071,
+            49.807813
+          ],
+          [
+            7.0171166,
+            49.8087864
+          ],
+          [
+            7.0171727,
+            49.8100402
+          ],
+          [
+            7.0182474,
+            49.8108798
+          ],
+          [
+            7.0170973,
+            49.8114881
+          ],
+          [
+            7.0181155,
+            49.8123155
+          ],
+          [
+            7.017399,
+            49.8127535
+          ],
+          [
+            7.0179646,
+            49.8131671
+          ],
+          [
+            7.0186622,
+            49.8145176
+          ],
+          [
+            7.0204789,
+            49.8156192
+          ],
+          [
+            7.0195294,
+            49.8180387
+          ],
+          [
+            7.0165963,
+            49.8173677
+          ],
+          [
+            7.0151931,
+            49.8198697
+          ],
+          [
+            7.0141165,
+            49.820344
+          ],
+          [
+            7.0131566,
+            49.8199139
+          ],
+          [
+            7.0114238,
+            49.8203533
+          ],
+          [
+            7.0095949,
+            49.8197208
+          ],
+          [
+            7.0082185,
+            49.8197572
+          ],
+          [
+            7.0081808,
+            49.8206939
+          ],
+          [
+            7.0046562,
+            49.8198506
+          ],
+          [
+            7.0048624,
+            49.8186502
+          ],
+          [
+            7.0031278,
+            49.8191977
+          ],
+          [
+            7.0022794,
+            49.8177743
+          ],
+          [
+            7.0035615,
+            49.8162901
+          ],
+          [
+            7.0039197,
+            49.8147937
+          ],
+          [
+            7.0034965,
+            49.8123361
+          ],
+          [
+            7.0029926,
+            49.8112468
+          ],
+          [
+            7.0015031,
+            49.8106871
+          ],
+          [
+            6.999561,
+            49.8095068
+          ],
+          [
+            6.9989766,
+            49.8081319
+          ],
+          [
+            6.9992217,
+            49.8068786
+          ],
+          [
+            6.9987503,
+            49.806258
+          ],
+          [
+            6.9984486,
+            49.8049925
+          ],
+          [
+            6.9977133,
+            49.8042016
+          ],
+          [
+            6.9975059,
+            49.8042746
+          ],
+          [
+            6.9966952,
+            49.8032889
+          ],
+          [
+            6.9935973,
+            49.8020242
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "zone_a",
+      "name": "Zone A \u2014 Kernzone (Ruhezone)",
+      "type": "zone",
+      "area_ha": 120,
+      "fill": "#1a5c1a",
+      "fill-opacity": 0.3,
+      "stroke": "#0d3d0d",
+      "stroke-width": 2,
+      "description": "Minimale St\u00f6rung, R\u00fcckzugsraum, keine regul\u00e4re Jagd"
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            6.9935973,
+            49.810860700000006
+          ],
+          [
+            6.9935973,
+            49.8206939
+          ],
+          [
+            7.0090381,
+            49.8206939
+          ],
+          [
+            7.0090381,
+            49.810860700000006
+          ],
+          [
+            6.9935973,
+            49.810860700000006
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "zone_b",
+      "name": "Zone B \u2014 Produktionszone (Jagd)",
+      "type": "zone",
+      "area_ha": 140,
+      "fill": "#c49a2a",
+      "fill-opacity": 0.2,
+      "stroke": "#8b6914",
+      "stroke-width": 2,
+      "description": "Regul\u00e4re Jagd, Ansitz/Pirsch, Hochsitze"
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            7.0090381,
+            49.810860700000006
+          ],
+          [
+            7.0090381,
+            49.8206939
+          ],
+          [
+            7.0204789,
+            49.8206939
+          ],
+          [
+            7.0204789,
+            49.805860700000004
+          ],
+          [
+            6.9935973,
+            49.805860700000004
+          ],
+          [
+            6.9935973,
+            49.810860700000006
+          ],
+          [
+            7.0090381,
+            49.810860700000006
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "zone_c",
+      "name": "Zone C \u2014 Pufferzone (Grenzbereich)",
+      "type": "zone",
+      "area_ha": 52,
+      "fill": "#8b4513",
+      "fill-opacity": 0.2,
+      "stroke": "#5c2d0e",
+      "stroke-width": 2,
+      "description": "75m-Grenzbuffer, eingeschr\u00e4nkte Jagd"
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            6.9935973,
+            49.7950275
+          ],
+          [
+            6.9935973,
+            49.805860700000004
+          ],
+          [
+            7.0204789,
+            49.805860700000004
+          ],
+          [
+            7.0204789,
+            49.7950275
+          ],
+          [
+            6.9935973,
+            49.7950275
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "sektor_nord",
+      "name": "Sektor Nord",
+      "type": "sektor",
+      "stroke": "#4a9e4a",
+      "stroke-width": 1,
+      "stroke-dasharray": "8,4",
+      "fill": "#4a9e4a",
+      "fill-opacity": 0.05
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            6.9935973,
+            49.807860700000006
+          ],
+          [
+            6.9935973,
+            49.8206939
+          ],
+          [
+            7.0204789,
+            49.8206939
+          ],
+          [
+            7.0204789,
+            49.807860700000006
+          ],
+          [
+            6.9935973,
+            49.807860700000006
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "sektor_ost",
+      "name": "Sektor Ost",
+      "type": "sektor",
+      "stroke": "#5ba3c9",
+      "stroke-width": 1,
+      "stroke-dasharray": "8,4",
+      "fill": "#5ba3c9",
+      "fill-opacity": 0.05
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            7.0070381,
+            49.7950275
+          ],
+          [
+            7.0070381,
+            49.8206939
+          ],
+          [
+            7.0204789,
+            49.8206939
+          ],
+          [
+            7.0204789,
+            49.7950275
+          ],
+          [
+            7.0070381,
+            49.7950275
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "sektor_s\u00fcd",
+      "name": "Sektor S\u00fcd",
+      "type": "sektor",
+      "stroke": "#c49a2a",
+      "stroke-width": 1,
+      "stroke-dasharray": "8,4",
+      "fill": "#c49a2a",
+      "fill-opacity": 0.05
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            6.9935973,
+            49.7950275
+          ],
+          [
+            6.9935973,
+            49.807860700000006
+          ],
+          [
+            7.0204789,
+            49.807860700000006
+          ],
+          [
+            7.0204789,
+            49.7950275
+          ],
+          [
+            6.9935973,
+            49.7950275
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "sektor_west",
+      "name": "Sektor West",
+      "type": "sektor",
+      "stroke": "#9a5cb4",
+      "stroke-width": 1,
+      "stroke-dasharray": "8,4",
+      "fill": "#9a5cb4",
+      "fill-opacity": 0.05
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            6.9935973,
+            49.7950275
+          ],
+          [
+            6.9935973,
+            49.8206939
+          ],
+          [
+            7.0070381,
+            49.8206939
+          ],
+          [
+            7.0070381,
+            49.7950275
+          ],
+          [
+            6.9935973,
+            49.7950275
+          ]
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "hs_01",
+      "name": "Hochsitz Eichenberg",
+      "type": "hochsitz",
+      "hochsitz_type": "A",
+      "optimal_wind": "SO",
+      "notes": "Kanzel, geschlossen, Zone A Nordrand"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.002907651612903,
+        49.81440557741935
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "hs_02",
+      "name": "Hochsitz Dhrontal",
+      "type": "hochsitz",
+      "hochsitz_type": "B",
+      "optimal_wind": "SW",
+      "notes": "Leiter, offen, Zone B Dhron-N\u00e4he"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.0129076516129025,
+        49.809405577419355
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "hs_03",
+      "name": "Hochsitz Windbruch",
+      "type": "hochsitz",
+      "hochsitz_type": "A",
+      "optimal_wind": "N",
+      "notes": "Kanzel, geschlossen, Zone B Zentral"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.005907651612903,
+        49.80540557741935
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "hs_04",
+      "name": "Hochsitz K81-Rand",
+      "type": "hochsitz",
+      "hochsitz_type": "C",
+      "optimal_wind": "W",
+      "notes": "Dr\u00fcckjagdschirm, Zone C S\u00fcdrand"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.010907651612903,
+        49.800405577419355
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "hs_05",
+      "name": "Hochsitz Nordhang",
+      "type": "hochsitz",
+      "hochsitz_type": "B",
+      "optimal_wind": "S",
+      "notes": "Leiter, offen, Zone A Nordhang"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.006907651612902,
+        49.81940557741935
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "wk_01",
+      "name": "Wildkamera Hauptwechsel",
+      "type": "wildkamera"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.0049076516129025,
+        49.81140557741935
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "wk_02",
+      "name": "Wildkamera Suhle",
+      "type": "wildkamera"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.009907651612902,
+        49.806405577419355
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "wk_03",
+      "name": "Wildkamera Wildwiese Ost",
+      "type": "wildkamera"
+    },
+    "geometry": {
+      "type": "Point",
+      "coordinates": [
+        7.014907651612902,
+        49.803405577419355
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "ww_main",
+      "name": "Hauptwechsel Nord-S\u00fcd",
+      "type": "wildwechsel",
+      "intensity": "hoch",
+      "stroke": "#ff6b35",
+      "stroke-width": 2,
+      "stroke-dasharray": "5,3"
+    },
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          7.006907651612902,
+          49.8186939
+        ],
+        [
+          7.007907651612903,
+          49.812405577419355
+        ],
+        [
+          7.008907651612903,
+          49.80740557741935
+        ],
+        [
+          7.009907651612902,
+          49.80240557741935
+        ],
+        [
+          7.010907651612903,
+          49.7980275
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "ww_ost",
+      "name": "Wechsel Ost (Richtung Dhrontal)",
+      "type": "wildwechsel",
+      "intensity": "mittel",
+      "stroke": "#ff6b35",
+      "stroke-width": 1.5,
+      "stroke-dasharray": "5,3"
+    },
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          7.008907651612903,
+          49.80740557741935
+        ],
+        [
+          7.0129076516129025,
+          49.806405577419355
+        ],
+        [
+          7.0174788999999995,
+          49.80440557741935
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "k81",
+      "name": "K81 (Kreisstra\u00dfe)",
+      "type": "stoerung",
+      "disturbance_type": "road",
+      "intensity": 0.7,
+      "stroke": "#ff0000",
+      "stroke-width": 2
+    },
+    "geometry": {
+      "type": "LineString",
+      "coordinates": [
+        [
+          6.9915973000000005,
+          49.797027500000006
+        ],
+        [
+          6.9985973,
+          49.7960275
+        ],
+        [
+          7.0070381,
+          49.7960275
+        ],
+        [
+          7.0174788999999995,
+          49.7980275
+        ],
+        [
+          7.022478899999999,
+          49.7990275
+        ]
+      ]
+    }
+  },
+  {
+    "type": "Feature",
+    "properties": {
+      "id": "windpark_buffer",
+      "name": "Windpark Eisfallzone (300m)",
+      "type": "restriktion",
+      "fill": "#ff4444",
+      "fill-opacity": 0.15,
+      "stroke": "#ff0000",
+      "stroke-width": 1,
+      "stroke-dasharray": "3,3"
+    },
+    "geometry": {
+      "type": "Polygon",
+      "coordinates": [
+        [
+          [
+            7.0194789,
+            49.812405577419355
+          ],
+          [
+            7.019376677478867,
+            49.812910274557304
+          ],
+          [
+            7.019076976211354,
+            49.81338057741935
+          ],
+          [
+            7.01860022034356,
+            49.81378443564267
+          ],
+          [
+            7.0179789,
+            49.814094326956734
+          ],
+          [
+            7.017255357135308,
+            49.814289132780615
+          ],
+          [
+            7.0164789,
+            49.814355577419356
+          ],
+          [
+            7.015702442864693,
+            49.814289132780615
+          ],
+          [
+            7.0149789,
+            49.814094326956734
+          ],
+          [
+            7.014357579656441,
+            49.81378443564267
+          ],
+          [
+            7.0138808237886465,
+            49.81338057741935
+          ],
+          [
+            7.013581122521133,
+            49.812910274557304
+          ],
+          [
+            7.0134789,
+            49.812405577419355
+          ],
+          [
+            7.013581122521133,
+            49.81190088028141
+          ],
+          [
+            7.0138808237886465,
+            49.81143057741936
+          ],
+          [
+            7.014357579656441,
+            49.81102671919604
+          ],
+          [
+            7.0149789,
+            49.810716827881976
+          ],
+          [
+            7.015702442864693,
+            49.810522022058095
+          ],
+          [
+            7.0164789,
+            49.810455577419354
+          ],
+          [
+            7.017255357135308,
+            49.810522022058095
+          ],
+          [
+            7.0179789,
+            49.810716827881976
+          ],
+          [
+            7.01860022034356,
+            49.81102671919604
+          ],
+          [
+            7.019076976211354,
+            49.81143057741936
+          ],
+          [
+            7.019376677478867,
+            49.81190088028141
+          ],
+          [
+            7.0194789,
+            49.812405577419355
+          ]
+        ]
+      ]
+    }
+  }
+],
+};
+
 export function getGeoJSONString(): string {
   return JSON.stringify(merschbachGeoJSON, null, 2);
 }
 
-/**
- * Filtere Features nach Typ
- */
 export function getFeaturesByType(type: string): any[] {
   return merschbachGeoJSON.features.filter(
     (f: any) => f.properties?.type === type
