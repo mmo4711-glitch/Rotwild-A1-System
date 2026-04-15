@@ -134,46 +134,55 @@ export interface ZoneData {
   color: string;
 }
 
+/**
+ * Kalibrierte Zonendaten basierend auf:
+ * - OSM Gemarkungsgrenze (62-Punkte-Polygon, Relation 1258428)
+ * - Höhenprofil 340-520m (NW→SO fallend, Erbeskopf→Dhrontal)
+ * - Waldanteil aus Revierbeschreibung (240ha Wald / 312ha gesamt = 77%)
+ * - Störungsabstände berechnet aus K81-Position
+ * 
+ * Kalibrierung: 15.04.2026, Issue #2
+ */
 export const MERSCHBACH_ZONES: ZoneData[] = [
   {
     id: 'zone-a',
     name: 'Zone A — Kerngebiet',
-    description: 'Hochwaldgebiet mit dichtem Baumbestand und geringer Störung',
+    description: 'Hochwaldgebiet NW (484m), dichter Bestand, fern von K81. Ruhezone.',
     input: {
-      cover: 65,
-      slope: 18,
-      aspect: 160,
-      disturbance: 450,
-      forestPct: 82,
-      edgeDensity: 55,
+      cover: 78,          // Kronendach 78% — dichter Hochwald
+      slope: 14,          // 14.2° — steiler NW-Hang
+      aspect: 205,        // SW-Exposition — gut für Winterhabitat
+      disturbance: 850,   // 850m zur K81 — geringste Störung
+      forestPct: 87,      // 87% Wald — dichtester Bereich
+      edgeDensity: 35,    // 35 m/ha — wenig Rand, geschlossener Wald (LIMITIEREND)
     },
     color: '#4a9e4a',
   },
   {
     id: 'zone-b',
-    name: 'Zone B — Randbereich',
-    description: 'Übergangszone zwischen Wald und landwirtschaftlicher Fläche',
+    name: 'Zone B — Produktionszone',
+    description: 'Mischgebiet Zentral-Ost (459m), moderate Hangneigung, strukturreich.',
     input: {
-      cover: 40,
-      slope: 12,
-      aspect: 210,
-      disturbance: 250,
-      forestPct: 55,
-      edgeDensity: 78,
+      cover: 55,          // Kronendach 55% — lockerer Mischwald
+      slope: 9,           // 8.5° — moderate Neigung
+      aspect: 155,        // SSO-Exposition
+      disturbance: 420,   // 420m zur K81
+      forestPct: 65,      // 65% Wald — gute Mischung
+      edgeDensity: 95,    // 95 m/ha — optimaler Randbereich
     },
     color: '#c49a2a',
   },
   {
     id: 'zone-c',
-    name: 'Zone C — Offenland',
-    description: 'Landwirtschaftliche Fläche mit wenig Deckung, hohe Störung',
+    name: 'Zone C — Pufferzone',
+    description: 'Südrand (420m), K81-nah, Windpark, fragmentiertes Wald-Feld-Mosaik.',
     input: {
-      cover: 15,
-      slope: 5,
-      aspect: 90,
-      disturbance: 100,
-      forestPct: 20,
-      edgeDensity: 30,
+      cover: 38,          // Kronendach 38% — offener
+      slope: 6,           // 5.8° — flacher Bereich
+      aspect: 95,         // Ost-Exposition — weniger optimal im Winter
+      disturbance: 150,   // 150m zur K81 — höchste Störung! (LIMITIEREND)
+      forestPct: 42,      // 42% Wald — viel Offenland
+      edgeDensity: 140,   // 140 m/ha — stark fragmentiert
     },
     color: '#8B6914',
   },

@@ -1,0 +1,74 @@
+{
+  "zone_a": {
+    "center_lat": 49.814793980000005,
+    "center_lon": 6.999773620000001,
+    "elevation_m": 484,
+    "slope_degrees": 14.2,
+    "aspect_degrees": 205,
+    "canopy_cover": 0.78,
+    "understory_density": 0.65,
+    "forest_proportion": 0.87,
+    "disturbance_distance_m": 850,
+    "disturbance_intensity": 0.2,
+    "edge_density_m_per_ha": 35,
+    "si_scores": {
+      "Deckung": 0.888876402731706,
+      "Hangneigung": 0.8160000000000001,
+      "Exposition": 0.971892336110995,
+      "Stoerung": 1,
+      "Waldanteil": 0.856,
+      "Randdichte": 0.425
+    },
+    "hsi": 0.797,
+    "quality": "gut",
+    "limiting_factor": "Randdichte"
+  },
+  "zone_b": {
+    "center_lat": 49.81224161428572,
+    "center_lon": 7.007895242857143,
+    "elevation_m": 459,
+    "slope_degrees": 8.5,
+    "aspect_degrees": 155,
+    "canopy_cover": 0.55,
+    "understory_density": 0.4,
+    "forest_proportion": 0.65,
+    "disturbance_distance_m": 420,
+    "disturbance_intensity": 0.45,
+    "edge_density_m_per_ha": 95,
+    "si_scores": {
+      "Deckung": 0.6887246539984299,
+      "Hangneigung": 0.93,
+      "Exposition": 0.971892336110995,
+      "Stoerung": 0.8866666666666667,
+      "Waldanteil": 1.0,
+      "Randdichte": 0.8428571428571429
+    },
+    "hsi": 0.88,
+    "quality": "optimal",
+    "limiting_factor": "Deckung"
+  },
+  "zone_c": {
+    "center_lat": 49.79936078000001,
+    "center_lon": 7.00434994,
+    "elevation_m": 420,
+    "slope_degrees": 5.8,
+    "aspect_degrees": 95,
+    "canopy_cover": 0.38,
+    "understory_density": 0.25,
+    "forest_proportion": 0.42,
+    "disturbance_distance_m": 150,
+    "disturbance_intensity": 0.75,
+    "edge_density_m_per_ha": 140,
+    "si_scores": {
+      "Deckung": 0.5385164807134505,
+      "Hangneigung": 0.984,
+      "Exposition": 0.7261467228242975,
+      "Stoerung": 0.4,
+      "Waldanteil": 0.84,
+      "Randdichte": 0.9714285714285715
+    },
+    "hsi": 0.708,
+    "quality": "gut",
+    "limiting_factor": "Stoerung"
+  }
+}
