@@ -25,6 +25,7 @@ import Tagebuch from "@/pages/tagebuch";
 import Wildwiesen from "@/pages/wildwiesen";
 import Drueckjagd from "@/pages/drueckjagd";
 import Vergleich from "@/pages/vergleich";
+import Jaeger from "@/pages/jaeger";
 import NotFound from "@/pages/not-found";
 
 function AppRouter() {
@@ -48,6 +49,7 @@ function AppRouter() {
       <Route path="/vergleich" component={Vergleich} />
       <Route path="/health" component={Health} />
       <Route path="/architektur" component={Architektur} />
+      <Route path="/jaeger" component={Jaeger} />
       <Route component={NotFound} />
     </Switch>
   );

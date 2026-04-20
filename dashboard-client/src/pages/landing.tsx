@@ -15,6 +15,7 @@ import {
   CloudRain,
   Thermometer,
 } from "lucide-react";
+import { JagdscheinVerificationWidget } from "@/components/jagdschein";
 
 /* ─── antler/tree SVG logo ─── */
 function AntlerLogo() {
@@ -346,6 +347,9 @@ export default function Landing() {
           }
         `}</style>
       </section>
+
+      {/* ─── Jagdschein-Verifizierung (public) ─── */}
+      <JagdscheinVerificationWidget />
 
       {/* ─── Revier-Steckbrief ─── */}
       <section className="px-6 pb-12 max-w-5xl mx-auto">

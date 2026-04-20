@@ -77,3 +77,29 @@ export const insertLogEntrySchema = createInsertSchema(logEntries).omit({
 
 export type InsertLogEntry = z.infer<typeof insertLogEntrySchema>;
 export type LogEntry = typeof logEntries.$inferSelect;
+
+// ── Hunters (Jagdschein-Verifizierung) ───────────────────────
+export const hunters = sqliteTable("hunters", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  jagdscheinNr: text("jagdschein_nr").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  firstName: text("first_name").notNull(),
+  lastName: text("last_name").notNull(),
+  birthDate: text("birth_date"),
+  validFrom: text("valid_from").notNull(),
+  validUntil: text("valid_until").notNull(),
+  issuer: text("issuer").notNull(),
+  type: text("type").notNull(),
+  status: text("status").notNull(),
+  revier: text("revier"),
+  role: text("role"),
+  photoUrl: text("photo_url"),
+  notes: text("notes"),
+});
+
+export const insertHunterSchema = createInsertSchema(hunters).omit({
+  id: true,
+});
+
+export type InsertHunter = z.infer<typeof insertHunterSchema>;
+export type Hunter = typeof hunters.$inferSelect;

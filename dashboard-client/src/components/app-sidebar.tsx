@@ -17,6 +17,7 @@ import {
   Layers,
   TrendingUp,
   Users,
+  ShieldCheck,
 } from "lucide-react";
 import {
   Sidebar,
@@ -77,6 +78,7 @@ const navGroups: NavGroup[] = [
     items: [
       { title: "System-Health", url: "/health", icon: Activity },
       { title: "Architektur", url: "/architektur", icon: Layers },
+      { title: "J\u00e4gerverwaltung", url: "/jaeger", icon: ShieldCheck },
     ],
   },
 ];

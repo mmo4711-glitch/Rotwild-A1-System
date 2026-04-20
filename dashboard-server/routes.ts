@@ -1,7 +1,8 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { storage } from "./storage";
-import { insertHarvestSchema, insertCameraSightingSchema, insertLogEntrySchema } from "@shared/schema";
+import { storage, sha256 } from "./storage";
+import { insertHarvestSchema, insertCameraSightingSchema, insertLogEntrySchema, insertHunterSchema } from "@shared/schema";
+import { z } from "zod";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -80,6 +81,138 @@ export async function registerRoutes(
     if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
     await storage.deleteLogEntry(id);
     res.status(204).send();
+  });
+
+  // ── Hunters: Admin registration & list ──────────────────
+  // Schema where the admin sends the plain password; server hashes it.
+  const registerHunterSchema = insertHunterSchema
+    .omit({ passwordHash: true })
+    .extend({ password: z.string().min(3) });
+
+  app.get("/api/hunters", async (_req, res) => {
+    const all = await storage.getHunters();
+    // Don't leak password hashes
+    res.json(all.map(({ passwordHash, ...rest }) => rest));
+  });
+
+  app.post("/api/hunters", async (req, res) => {
+    const parsed = registerHunterSchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ error: parsed.error.flatten() });
+    }
+    const { password, ...data } = parsed.data;
+    try {
+      const hunter = await storage.createHunter({
+        ...data,
+        passwordHash: sha256(password),
+      });
+      const { passwordHash: _ph, ...safe } = hunter;
+      res.status(201).json(safe);
+    } catch (err: any) {
+      if (String(err?.message || "").includes("UNIQUE")) {
+        return res.status(409).json({ error: "Jagdschein-Nr bereits vergeben" });
+      }
+      res.status(500).json({ error: "Fehler beim Anlegen des J\u00e4gers" });
+    }
+  });
+
+  app.delete("/api/hunters/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid id" });
+    await storage.deleteHunter(id);
+    res.status(204).send();
+  });
+
+  // ── Verification: full (password required) ───────────────
+  // Client may send either plain password (fallback) or already-hashed (preferred).
+  const verifySchema = z.object({
+    jagdscheinNr: z.string().min(1),
+    password: z.string().min(1).optional(),
+    passwordHash: z.string().min(1).optional(),
+  });
+
+  app.post("/api/verify", async (req, res) => {
+    const parsed = verifySchema.safeParse(req.body);
+    if (!parsed.success) {
+      return res.status(400).json({ valid: false, reason: "invalid_request" });
+    }
+    const { jagdscheinNr, password, passwordHash } = parsed.data;
+    const hunter = await storage.getHunterByNr(jagdscheinNr.trim());
+    if (!hunter) {
+      return res.json({ valid: false, reason: "unknown_nr", message: "Jagdschein-Nr nicht gefunden." });
+    }
+    const sentHash = passwordHash ?? (password ? sha256(password) : "");
+    if (!sentHash || sentHash !== hunter.passwordHash) {
+      return res.json({ valid: false, reason: "wrong_password", message: "Falsches Passwort." });
+    }
+
+    // Check status / expiry
+    const today = new Date().toISOString().slice(0, 10);
+    const expired = hunter.validUntil < today;
+    const effectiveStatus = expired ? "abgelaufen" : hunter.status;
+
+    const valid = effectiveStatus === "aktiv";
+    res.json({
+      valid,
+      reason: valid ? null : effectiveStatus,
+      jagdscheinNr: hunter.jagdscheinNr,
+      firstName: hunter.firstName,
+      lastName: hunter.lastName,
+      name: `${hunter.firstName} ${hunter.lastName}`,
+      validFrom: hunter.validFrom,
+      validUntil: hunter.validUntil,
+      issuer: hunter.issuer,
+      type: hunter.type,
+      status: effectiveStatus,
+      revier: hunter.revier,
+      role: hunter.role,
+    });
+  });
+
+  // ── Public status check (no password) ───────────────────
+  // Returns ONLY status & expiry. No personal data.
+  app.get("/api/verify/:nr", async (req, res) => {
+    const nr = req.params.nr.trim();
+    const hunter = await storage.getHunterByNr(nr);
+    if (!hunter) {
+      return res.json({ valid: false, reason: "unknown_nr", jagdscheinNr: nr });
+    }
+    const today = new Date().toISOString().slice(0, 10);
+    const expired = hunter.validUntil < today;
+    const effectiveStatus = expired ? "abgelaufen" : hunter.status;
+    res.json({
+      valid: effectiveStatus === "aktiv",
+      jagdscheinNr: hunter.jagdscheinNr,
+      status: effectiveStatus,
+      validUntil: hunter.validUntil,
+    });
+  });
+
+  // ── Wallet pass data (full personal info, for display in a pass) ──
+  app.get("/api/wallet/:nr", async (req, res) => {
+    const nr = req.params.nr.trim();
+    const hunter = await storage.getHunterByNr(nr);
+    if (!hunter) return res.status(404).json({ error: "Nicht gefunden" });
+    const today = new Date().toISOString().slice(0, 10);
+    const expired = hunter.validUntil < today;
+    const effectiveStatus = expired ? "abgelaufen" : hunter.status;
+    res.json({
+      passType: "jagdschein",
+      organization: "Eigenjagdbezirk Merschbach",
+      jagdscheinNr: hunter.jagdscheinNr,
+      firstName: hunter.firstName,
+      lastName: hunter.lastName,
+      name: `${hunter.firstName} ${hunter.lastName}`,
+      validFrom: hunter.validFrom,
+      validUntil: hunter.validUntil,
+      issuer: hunter.issuer,
+      type: hunter.type,
+      status: effectiveStatus,
+      revier: hunter.revier,
+      role: hunter.role,
+      // Simulated barcode payload (for QR)
+      qrPayload: `JAGDSCHEIN:${hunter.jagdscheinNr}|${hunter.validUntil}|${effectiveStatus}`,
+    });
   });
 
   return httpServer;
